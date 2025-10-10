@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [status, setStatus] = useState("");
   const router = useRouter();
 
@@ -12,6 +12,13 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ✅ Validate confirm password
+    if (form.password !== form.confirmPassword) {
+      setStatus("❌ Passwords do not match");
+      return;
+    }
+
     setStatus("Registering...");
 
     try {
@@ -19,10 +26,10 @@ export default function RegisterPage() {
       const res = await fetch("http://localhost:5000/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, role: "guest" }),
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: "guest" }),
       });
-      const data = await res.json();
 
+      const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
       setStatus("✅ Registration successful! Logging in...");
@@ -78,6 +85,15 @@ export default function RegisterPage() {
           className="border rounded w-full p-2"
           required
         />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          className="border rounded w-full p-2"
+          required
+        />
         <button
           type="submit"
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
@@ -86,11 +102,7 @@ export default function RegisterPage() {
         </button>
       </form>
       {status && (
-        <p
-          className={`mt-3 ${
-            status.startsWith("❌") ? "text-red-600" : "text-gray-600"
-          }`}
-        >
+        <p className={`mt-3 ${status.startsWith("❌") ? "text-red-600" : "text-gray-600"}`}>
           {status}
         </p>
       )}

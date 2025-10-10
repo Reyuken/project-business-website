@@ -35,6 +35,7 @@ export default function Navbar() {
         <Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
         <Link href="/about" className="text-gray-600 hover:text-blue-600">About</Link>
         <Link href="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
+        <Link href="/careers" className="text-gray-600 hover:text-blue-600">Careers</Link>
 
         {!user && (
           <Link href="/login" className="text-gray-600 hover:text-blue-600 font-semibold">Login</Link>
