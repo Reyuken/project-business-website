@@ -105,3 +105,12 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+// ✅ Guest-only route to fetch their own messages
+app.get("/api/messages/me", verifyToken, (req, res) => {
+  const sql = "SELECT * FROM messages WHERE email = ? ORDER BY id DESC";
+  db.query(sql, [req.user.email], (err, results) => {
+    if (err) return res.status(500).send(err);
+    res.json(results);
+  });
+});

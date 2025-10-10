@@ -78,9 +78,19 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* ✅ Register Button */}
+        <p className="mt-4 text-center text-gray-600">
+          Don't have an account?{" "}
+          <button
+            onClick={() => router.push("/register")}
+            className="text-blue-600 underline"
+          >
+            Register
+          </button>
+        </p>
+
         {status && <p className="mt-3 text-gray-600">{status}</p>}
       </div>
     </>
   );
 }
-
