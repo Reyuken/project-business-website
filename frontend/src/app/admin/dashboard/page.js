@@ -8,6 +8,12 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // ✅ Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/admin/login");
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -40,8 +46,19 @@ export default function AdminDashboard() {
   if (error) return <p className="p-6 text-red-600">{error}</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4 text-blue-700">Admin Dashboard</h1>
+    <div className="max-w-6xl mx-auto p-6">
+      {/* ✅ Dashboard Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-blue-700">Admin Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* ✅ Messages Table */}
       <div className="overflow-x-auto border rounded-lg shadow">
         <table className="w-full border-collapse">
           <thead>
