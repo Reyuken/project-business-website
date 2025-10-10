@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -32,50 +33,54 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-sm mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4 text-blue-700">Login</h1>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        {/* Email */}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="border rounded w-full p-2"
-          required
-        />
-
-        {/* Password with toggle */}
-        <div className="relative">
+    <>
+      <Navbar/>
+      <div className="max-w-sm mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4 text-blue-700">Login</h1>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Email */}
           <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            placeholder="Password"
-            value={form.password}
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
             onChange={handleChange}
-            className="border rounded w-full p-2 pr-10"
+            className="border rounded w-full p-2"
             required
           />
+
+          {/* Password with toggle */}
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              className="border rounded w-full p-2 pr-10"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          {/* Submit */}
           <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-2 text-sm text-gray-500 hover:text-gray-700"
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
           >
-            {showPassword ? "Hide" : "Show"}
+            Login
           </button>
-        </div>
+        </form>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
-        >
-          Login
-        </button>
-      </form>
-
-      {status && <p className="mt-3 text-gray-600">{status}</p>}
-    </div>
+        {status && <p className="mt-3 text-gray-600">{status}</p>}
+      </div>
+    </>
   );
 }
+
