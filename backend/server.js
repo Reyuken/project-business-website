@@ -37,7 +37,6 @@ app.post("/api/contact", (req, res) => {
 app.post("/api/register", async (req, res) => {
   const { name, email, password, role = "guest" } = req.body;
 
-  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   db.query(
@@ -79,7 +78,7 @@ app.post("/api/login", (req, res) => {
 // ✅ Middleware for protected routes
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "No token" });
+  if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -89,11 +88,14 @@ function verifyToken(req, res, next) {
   });
 }
 
-// ✅ Example: Admin-only route
+// ✅ Admin-only route to fetch messages
 app.get("/api/admin/messages", verifyToken, (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Forbidden" });
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
 
-  db.query("SELECT * FROM messages ORDER BY id DESC", (err, results) => {
+  const sql = "SELECT * FROM messages ORDER BY id DESC";
+  db.query(sql, (err, results) => {
     if (err) return res.status(500).send(err);
     res.json(results);
   });
