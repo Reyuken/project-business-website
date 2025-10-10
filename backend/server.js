@@ -36,7 +36,6 @@ app.post("/api/contact", (req, res) => {
 // ✅ Register
 app.post("/api/register", async (req, res) => {
   const { name, email, password, role = "guest" } = req.body;
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   db.query(
@@ -44,6 +43,9 @@ app.post("/api/register", async (req, res) => {
     [name, email, hashedPassword, role],
     (err, result) => {
       if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(400).json({ message: "Email is already registered" });
+        }
         console.error(err);
         return res.status(500).json({ message: "Registration failed" });
       }
@@ -51,6 +53,7 @@ app.post("/api/register", async (req, res) => {
     }
   );
 });
+
 
 // ✅ Login
 app.post("/api/login", (req, res) => {

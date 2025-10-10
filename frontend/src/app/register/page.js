@@ -22,11 +22,12 @@ export default function RegisterPage() {
         body: JSON.stringify({ ...form, role: "guest" }),
       });
       const data = await res.json();
+
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
       setStatus("✅ Registration successful! Logging in...");
 
-      // ✅ Wait a short moment before auto-login to ensure DB commit
+      // ✅ Short delay to ensure DB commit
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       // 2️⃣ Auto-login
@@ -40,7 +41,7 @@ export default function RegisterPage() {
 
       // 3️⃣ Save token and redirect
       localStorage.setItem("token", loginData.token);
-      router.push("/status"); // Make sure this matches your guest page route
+      router.push("/status");
     } catch (err) {
       setStatus("❌ " + err.message);
     }
@@ -79,12 +80,20 @@ export default function RegisterPage() {
         />
         <button
           type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
         >
           Register
         </button>
       </form>
-      {status && <p className="mt-3 text-gray-600">{status}</p>}
+      {status && (
+        <p
+          className={`mt-3 ${
+            status.startsWith("❌") ? "text-red-600" : "text-gray-600"
+          }`}
+        >
+          {status}
+        </p>
+      )}
     </div>
   );
 }
