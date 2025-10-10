@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // Get the token from localStorage and decode role
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Decode JWT payload (without verification, just for role)
+        // Decode JWT payload without verification (just for role)
         const payload = JSON.parse(atob(token.split(".")[1]));
         setUser({ role: payload.role });
       } catch (err) {
@@ -23,6 +24,7 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    router.push("/login"); // redirect after logout
   };
 
   return (
