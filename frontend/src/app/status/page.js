@@ -28,7 +28,8 @@ export default function GuestStatusPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch messages");
+        if (!res.ok) throw new Error("Failed to fetch your submissions");
+
         const data = await res.json();
         setMessages(data);
       } catch (err) {
@@ -48,6 +49,7 @@ export default function GuestStatusPage() {
     <>
       <Navbar />
       <div className="max-w-4xl mx-auto p-6">
+        {/* Header and Logout */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-blue-700">Your Submissions</h1>
           <button
@@ -77,9 +79,7 @@ export default function GuestStatusPage() {
                     <td className="border p-2">{msg.name}</td>
                     <td className="border p-2">{msg.email}</td>
                     <td className="border p-2">{msg.message}</td>
-                    <td className="border p-2">
-                      {new Date(msg.created_at).toLocaleString()}
-                    </td>
+                    <td className="border p-2">{new Date(msg.created_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
