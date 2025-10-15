@@ -80,7 +80,7 @@ export default function LoginPage() {
 
         {/* ✅ Register Button */}
         <p className="mt-4 text-center text-gray-600">
-          Don't have an account?{" "}
+          Don&apos;t have an account? Sign up here.{" "}
           <button
             onClick={() => router.push("/register")}
             className="text-blue-600 underline"
