@@ -30,7 +30,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-red-950 shadow-md p-4 flex justify-between items-center relative">
+    <nav className="bg-red-950 shadow-md p-4 flex justify-between items-center relative bg-opacity-50">
       <Link href="/" className="flex items-center space-x-2">
         <Image
           src="/images/clusterpalLogo.png"

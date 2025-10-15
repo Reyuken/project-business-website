@@ -53,7 +53,7 @@ export default function CareersPage() {
     <>
       <Navbar />
       <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6 text-blue-700">Careers at ClusterPal</h1>
+        <h1 className="text-3xl font-bold mb-6 text-black">Careers at ClusterPal</h1>
         <p className="mb-6 text-gray-700">
           Explore current job openings and join our growing team!
         </p>

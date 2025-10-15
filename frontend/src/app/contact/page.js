@@ -38,9 +38,9 @@ export default function ContactPage() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col ">
+      <div className="flex flex-col min-h-screen">
 
-        <div className="max-w-md mx-auto p-20">
+        <div className="max-w-md mx-auto py-12 px-6">
           <h1 className="text-2xl font-bold mb-4 text-black">Contact Clusterpal</h1>
 
           {/* Contact Form */}
