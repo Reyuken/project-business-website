@@ -26,28 +26,34 @@ export default function HomePage() {
       <section className="py-16 px-6 bg-gray-50">
         <h2 className="text-3xl font-bold text-center text-blue-700 mb-12">Our Services</h2>
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          
           <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Customer Support</h3>
+            <h3 className="text-xl font-semibold mb-3">Finance & Accounting</h3>
             <p className="text-gray-600">
-              24/7 voice, chat, and email support for your customers — handled by trained professionals.
+              Comprehensive financial management services, including reporting, analysis, and process optimization to help streamline your operations.
             </p>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Data Entry & Back Office</h3>
+            <h3 className="text-xl font-semibold mb-3">Bookkeeping Services</h3>
             <p className="text-gray-600">
-              We manage repetitive data and back-office tasks so your team can focus on core business operations.
+              Accurate and timely bookkeeping to ensure your business maintains transparency, compliance, and reliable financial records.
             </p>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Virtual Assistance</h3>
+            <h3 className="text-xl font-semibold mb-3">Recruitment</h3>
             <p className="text-gray-600">
-              Skilled virtual assistants to support your administrative and operational needs.
+              End-to-end recruitment support — from sourcing to onboarding — to help you build a competent and dependable workforce.
             </p>
           </div>
         </div>
+
+        <p className="text-center text-gray-600 mt-10 max-w-2xl mx-auto">
+          We also offer other related <span className="font-semibold">non-voice business support solutions</span> tailored to your organization’s needs.
+        </p>
       </section>
+
 
       {/* About Section */}
       <section className="py-16 px-6 text-center bg-white">
