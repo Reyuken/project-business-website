@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react"; // ✅ For the hamburger and close icons
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // Decode JWT payload without verification (just for role)
         const payload = JSON.parse(atob(token.split(".")[1]));
         setUser({ role: payload.role });
       } catch (err) {
@@ -24,14 +25,16 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
-    router.push("/login"); // redirect after logout
+    router.push("/login");
   };
 
   return (
-    <nav className="bg-white shadow-md p-4 flex justify-between items-center">
+    <nav className="bg-white shadow-md p-4 flex justify-between items-center relative">
+      {/* Logo */}
       <h1 className="font-bold text-xl text-orange-400">ClusterPal</h1>
 
-      <div className="space-x-4">
+      {/* Desktop Links */}
+      <div className="hidden md:flex space-x-4">
         <Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
         <Link href="/about" className="text-gray-600 hover:text-blue-600">About</Link>
         <Link href="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
@@ -55,6 +58,42 @@ export default function Navbar() {
           </>
         )}
       </div>
+
+      {/* Hamburger button for mobile */}
+      <button
+        className="md:hidden text-gray-700 hover:text-blue-600"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+
+      {/* Mobile dropdown menu */}
+      {isOpen && (
+        <div className="absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center space-y-3 py-4 md:hidden z-50">
+          <Link href="/" className="text-gray-600 hover:text-blue-600" onClick={() => setIsOpen(false)}>Home</Link>
+          <Link href="/about" className="text-gray-600 hover:text-blue-600" onClick={() => setIsOpen(false)}>About</Link>
+          <Link href="/contact" className="text-gray-600 hover:text-blue-600" onClick={() => setIsOpen(false)}>Contact</Link>
+          <Link href="/careers" className="text-gray-600 hover:text-blue-600" onClick={() => setIsOpen(false)}>Careers</Link>
+
+          {!user && (
+            <Link href="/login" className="text-gray-600 hover:text-blue-600 font-semibold" onClick={() => setIsOpen(false)}>Login</Link>
+          )}
+
+          {user?.role === "guest" && (
+            <>
+              <Link href="/status" className="text-gray-600 hover:text-blue-600 font-semibold" onClick={() => setIsOpen(false)}>My Submissions</Link>
+              <button onClick={() => { handleLogout(); setIsOpen(false); }} className="text-red-600 hover:text-red-700 font-semibold">Logout</button>
+            </>
+          )}
+
+          {user?.role === "admin" && (
+            <>
+              <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-600 font-semibold" onClick={() => setIsOpen(false)}>Dashboard</Link>
+              <button onClick={() => { handleLogout(); setIsOpen(false); }} className="text-red-600 hover:text-red-700 font-semibold">Logout</button>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
