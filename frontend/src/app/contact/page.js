@@ -39,6 +39,8 @@ export default function ContactPage() {
       <Navbar />
       <div className="max-w-md mx-auto p-6">
         <h1 className="text-2xl font-bold mb-4 text-blue-700">Contact Clusterpal</h1>
+
+        {/* Contact Form */}
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="text"
@@ -74,8 +76,31 @@ export default function ContactPage() {
             Send
           </button>
         </form>
+
         {status && <p className="mt-3 text-gray-600">{status}</p>}
+
+        {/* Further Inquiries Section */}
+        <div className="mt-10 border-t pt-6 text-gray-700">
+          <h2 className="text-lg font-semibold text-blue-700 mb-2">
+            For Further Inquiries, Contact:
+          </h2>
+          <ul className="space-y-1">
+            <li>
+              <span className="font-medium">Email:</span> admin@clusterpal.com
+            </li>
+            <li>
+              <span className="font-medium">Phone Number:</span> +63 928 947 8804
+            </li>
+            <li>
+              <span className="font-medium">Facebook Page:</span> Clusterpal PH
+            </li>
+            <li>
+              <span className="font-medium">Office Address:</span> Unit 1102, Park Centrale Bldg., IT Park, Jose Ma. Del Mar St., Lahug, Cebu City
+            </li>
+          </ul>
+        </div>
       </div>
+
     </>
   );
 }

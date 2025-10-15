@@ -29,7 +29,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      <h1 className="font-bold text-xl text-blue-700">ClusterPal</h1>
+      <h1 className="font-bold text-xl text-orange-400">ClusterPal</h1>
 
       <div className="space-x-4">
         <Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
