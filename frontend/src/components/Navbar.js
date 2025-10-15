@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react"; // ✅ For the hamburger and close icons
+import Image from "next/image";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -30,8 +31,16 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center relative">
-      {/* Logo */}
-      <h1 className="font-bold text-xl text-orange-400">ClusterPal</h1>
+      <Link href="/" className="flex items-center space-x-2">
+        <Image
+          src="/images/clusterpalLogo.png"
+          alt="ClusterPal Logo"
+          width={40}
+          height={40}
+          priority
+        />
+        <span className="font-bold text-xl text-orange-400">ClusterPal</span>
+      </Link>
 
       {/* Desktop Links */}
       <div className="hidden md:flex space-x-4">
