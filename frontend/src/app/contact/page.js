@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -37,70 +38,91 @@ export default function ContactPage() {
   return (
     <>
       <Navbar />
-      <div className="max-w-md mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4 text-blue-700">Contact Clusterpal</h1>
+      <div className="flex flex-col ">
 
-        {/* Contact Form */}
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="text"
-            name="name"
-            placeholder="Your Name"
-            value={form.name}
-            onChange={handleChange}
-            className="border rounded w-full p-2"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Your Email"
-            value={form.email}
-            onChange={handleChange}
-            className="border rounded w-full p-2"
-            required
-          />
-          <textarea
-            name="message"
-            placeholder="Your Message"
-            value={form.message}
-            onChange={handleChange}
-            className="border rounded w-full p-2"
-            rows="4"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Send
-          </button>
-        </form>
+        <div className="max-w-md mx-auto p-20">
+          <h1 className="text-2xl font-bold mb-4 text-black">Contact Clusterpal</h1>
 
-        {status && <p className="mt-3 text-gray-600">{status}</p>}
+          {/* Contact Form */}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              value={form.name}
+              onChange={handleChange}
+              className="border rounded w-full p-2"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              value={form.email}
+              onChange={handleChange}
+              className="border rounded w-full p-2"
+              required
+            />
+            <textarea
+              name="message"
+              placeholder="Your Message"
+              value={form.message}
+              onChange={handleChange}
+              className="border rounded w-full p-2"
+              rows="4"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Send
+            </button>
+          </form>
 
-        {/* Further Inquiries Section */}
-        <div className="mt-10 border-t pt-6 text-gray-700">
-          <h2 className="text-lg font-semibold text-blue-700 mb-2">
-            For Further Inquiries, Contact:
-          </h2>
-          <ul className="space-y-1">
-            <li>
-              <span className="font-medium">Email:</span> admin@clusterpal.com
-            </li>
-            <li>
-              <span className="font-medium">Phone Number:</span> +63 928 947 8804
-            </li>
-            <li>
-              <span className="font-medium">Facebook Page:</span> Clusterpal PH
-            </li>
-            <li>
-              <span className="font-medium">Office Address:</span> Unit 1102, Park Centrale Bldg., IT Park, Jose Ma. Del Mar St., Lahug, Cebu City
-            </li>
-          </ul>
+          {status && <p className="mt-3 text-gray-600">{status}</p>}
         </div>
       </div>
 
+      {/* Call to Action */}
+      <section className="bg-gradient-to-r from-red-900 to-red-950 text-white py-12 px-8 ">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
+          
+          {/* Further Inquiries (Left Side) */}
+          <div className="text-left max-w-md">
+            <h2 className="text-lg font-semibold text-yellow-300 mb-2">
+              For Further Inquiries, Contact:
+            </h2>
+            <ul className="space-y-2 text-sm md:text-base">
+              <li>
+                <span className="font-medium text-yellow-200">Email:</span> admin@clusterpal.com
+              </li>
+              <li>
+                <span className="font-medium text-yellow-200">Phone Number:</span> +63 928 947 8804
+              </li>
+              <li>
+                <span className="font-medium text-yellow-200">Facebook Page:</span>{" "}
+                <Link 
+                  href="https://www.facebook.com/p/Clusterpal-100093008121350/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-orange-400 hover:text-blue-600"
+                >
+                  Clusterpal PH
+                </Link>
+              </li>
+
+              <li>
+                <span className="font-medium text-yellow-200">Office Address:</span> Unit 1102, Park Centrale Bldg., IT Park, Jose Ma. Del Mar St., Lahug, Cebu City
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+            {/* Footer */}
+      <footer className="bg-gray-800 text-gray-300 text-center py-4 text-sm">
+        © {new Date().getFullYear()} Clusterpal BPO. All rights reserved.
+      </footer>
     </>
   );
 }

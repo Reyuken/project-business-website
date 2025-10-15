@@ -30,39 +30,40 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md p-4 flex justify-between items-center relative">
+    <nav className="bg-red-950 shadow-md p-4 flex justify-between items-center relative">
       <Link href="/" className="flex items-center space-x-2">
         <Image
           src="/images/clusterpalLogo.png"
           alt="ClusterPal Logo"
-          width={40}
-          height={40}
+          width={60}
+          height={60}
           priority
+          style={{ height: "auto", width: "auto" }}
         />
-        <span className="font-bold text-xl text-orange-400">ClusterPal</span>
+        <span className="font-bold text-L text-orange-400" style={{ fontFamily: "Times New Roman, Times, serif" }}>CLUSTERPAL</span>
       </Link>
 
       {/* Desktop Links */}
       <div className="hidden md:flex space-x-4">
-        <Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
-        <Link href="/about" className="text-gray-600 hover:text-blue-600">About</Link>
-        <Link href="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
-        <Link href="/careers" className="text-gray-600 hover:text-blue-600">Careers</Link>
+        <Link href="/" className="text-orange-400 hover:text-blue-600">Home</Link>
+        <Link href="/about" className="text-orange-400 hover:text-blue-600">About</Link>
+        <Link href="/contact" className="text-orange-400 hover:text-blue-600">Contact</Link>
+        <Link href="/careers" className="text-orange-400 hover:text-blue-600">Careers</Link>
 
         {!user && (
-          <Link href="/login" className="text-gray-600 hover:text-blue-600 font-semibold">Login</Link>
+          <Link href="/login" className="text-orange-400 hover:text-blue-600 font-semibold">Login</Link>
         )}
 
         {user?.role === "guest" && (
           <>
-            <Link href="/status" className="text-gray-600 hover:text-blue-600 font-semibold">My Submissions</Link>
+            <Link href="/status" className="text-orange-400 hover:text-blue-600 font-semibold">My Submissions</Link>
             <button onClick={handleLogout} className="text-red-600 hover:text-red-700 font-semibold">Logout</button>
           </>
         )}
 
         {user?.role === "admin" && (
           <>
-            <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-600 font-semibold">Dashboard</Link>
+            <Link href="/admin/dashboard" className="text-orange-400 hover:text-blue-600 font-semibold">Dashboard</Link>
             <button onClick={handleLogout} className="text-red-600 hover:text-red-700 font-semibold">Logout</button>
           </>
         )}

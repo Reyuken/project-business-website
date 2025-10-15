@@ -36,7 +36,7 @@ export default function LoginPage() {
     <>
       <Navbar/>
       <div className="max-w-sm mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4 text-blue-700">Login</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-3">
           {/* Email */}
           <input
