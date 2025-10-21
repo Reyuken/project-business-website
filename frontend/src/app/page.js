@@ -3,8 +3,17 @@
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 export default function HomePage() {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.6; // Slow motion (75% of normal speed)
+    }
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -12,6 +21,7 @@ export default function HomePage() {
       <section className="relative text-white text-center py-20 px-4 overflow-hidden">
         {/* Background Video */}
         <video
+          ref={videoRef}
           className="absolute top-0 left-0 w-full h-full object-cover"
           autoPlay
           loop
