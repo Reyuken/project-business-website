@@ -41,14 +41,40 @@ function verifyToken(req, res, next) {
 // ===================
 // ✅ Contact Form
 // ===================
-app.post("/api/contact", (req, res) => {
+import nodemailer from "nodemailer";
+
+app.post("/api/contact", async (req, res) => {
   const { name, email, message } = req.body;
-  const sql = "INSERT INTO messages (name, email, message) VALUES (?, ?, ?)";
-  db.query(sql, [name, email, message], (err, result) => {
-    if (err) return res.status(500).json({ message: "Failed to save message" });
-    res.status(200).json({ message: "Message saved successfully" });
-  });
+
+  try {
+    // 1️⃣ Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // or use "Outlook", "Yahoo", or a custom SMTP config
+      auth: {
+        user: process.env.EMAIL_USER, // your email address
+        pass: process.env.EMAIL_PASS, // your app-specific password
+      },
+    });
+
+    // 2️⃣ Create email content
+    const mailOptions = {
+      from: `"${name}" <${email}>`,
+      to: "unabiaray0@gmail.com", // your receiving email
+      subject: `📬 New Message from ${name}`,
+      text: `You received a new message from ${name} (${email}):\n\n${message}`,
+    };
+
+    // 3️⃣ Send email
+    await transporter.sendMail(mailOptions);
+
+    console.log(`✅ Email sent successfully from ${email}`);
+    res.status(200).json({ message: "Email sent successfully!" });
+  } catch (err) {
+    console.error("❌ Error sending email:", err);
+    res.status(500).json({ message: "Failed to send email." });
+  }
 });
+
 
 // ===================
 // ✅ Register
