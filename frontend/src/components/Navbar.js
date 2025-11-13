@@ -50,6 +50,11 @@ export default function Navbar() {
         <Link href="/contact" className="text-orange-400 hover:text-blue-600">Contact</Link>
         <Link href="/careers" className="text-orange-400 hover:text-blue-600">Careers</Link>
 
+
+        {user?.role === "admin" && (
+          <Link href="/careersAdmin"className="text-orange-400 hover:text-blue-600 font-semibold">Manage Careers</Link>
+          
+        )}
         {!user && (
           <Link href="/login" className="text-orange-400 hover:text-blue-600 font-semibold">Login</Link>
         )}
@@ -67,7 +72,10 @@ export default function Navbar() {
             <button onClick={handleLogout} className="text-red-600 hover:text-red-700 font-semibold">Logout</button>
           </>
         )}
+
+
       </div>
+
 
       {/* Hamburger button for mobile */}
       <button
