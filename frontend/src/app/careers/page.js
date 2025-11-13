@@ -41,10 +41,11 @@ export default function Careers() {
     const formData = new FormData();
     formData.append("name", applicantName);
     formData.append("email", applicantEmail);
+    formData.append("jobId", selectedJob.id);
     if (resumeFile) formData.append("resume", resumeFile);
 
     try {
-      const response = await fetch(`${API_URL}/api/jobs/${selectedJob.id}/apply`, {
+      const response = await fetch(`${API_URL}/api/careers/apply`, {
         method: "POST",
         body: formData,
       });

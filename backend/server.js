@@ -4,9 +4,29 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
+
+
+// Configure multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/uploads"); // folder to save uploaded resumes
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
 
 dotenv.config();
+
 const app = express();
+// Serve uploaded files from public/uploads
+app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
+
 app.use(cors());
 app.use(express.json());
 
@@ -158,17 +178,26 @@ app.get("/api/careers/me", verifyToken, (req, res) => {
 // ===================
 // ✅ Submit Career Application
 // ===================
-app.post("/api/careers/apply", (req, res) => {
-  const { name, email, resume, jobId } = req.body;
-  const sql = "INSERT INTO applications (name, email, resume, job_id) VALUES (?, ?, ?, ?)";
-  db.query(sql, [name, email, resume, jobId], (err, result) => {
+app.post("/api/careers/apply", upload.single("resume"), (req, res) => {
+  const { name, email, jobId } = req.body;
+  const resumeFile = req.file;
+
+  if (!resumeFile) {
+    return res.status(400).json({ message: "Resume file is required" });
+  }
+
+  const resumePath = `/uploads/${resumeFile.filename}`;
+
+  const sql = "INSERT INTO applications (applicant_name, applicant_email, resume_path, job_id) VALUES (?, ?, ?, ?)";
+  db.query(sql, [name, email, resumePath, jobId], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: "Failed to submit application" });
     }
-    res.status(200).json({ message: "Application submitted successfully" });
+    res.status(200).json({ message: "Application submitted successfully!" });
   });
 });
+
 
 // ===================
 // ✅ Admin: Fetch All Messages
