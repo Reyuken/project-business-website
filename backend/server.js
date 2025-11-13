@@ -190,3 +190,47 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
+
+// ===================
+// Get All Jobs (Public)
+// ===================
+
+app.get("/api/jobs", (req, res) => {
+  const sql = "SELECT * FROM jobs ORDER BY id DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: "Failed to fetch jobs" });
+    res.json(results);
+  });
+});
+
+// ===================
+// Get All Jobs (Admin)
+// ===================
+
+app.post("/api/admin/jobs", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  const { title, description } = req.body;
+  if (!title || !description) return res.status(400).json({ message: "Missing fields" });
+
+  const sql = "INSERT INTO jobs (title, description) VALUES (?, ?)";
+  db.query(sql, [title, description], (err, result) => {
+    if (err) return res.status(500).json({ message: "Failed to add job" });
+    res.status(201).json({ id: result.insertId, title, description });
+  });
+});
+
+// ===================
+// Delete Jobs (Admin)
+// ===================
+
+app.delete("/api/admin/jobs/:id", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  const { id } = req.params;
+  const sql = "DELETE FROM jobs WHERE id = ?";
+  db.query(sql, [id], (err) => {
+    if (err) return res.status(500).json({ message: "Failed to delete job" });
+    res.status(204).end();
+  });
+});
