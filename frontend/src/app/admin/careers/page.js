@@ -2,19 +2,24 @@
 
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 
 export default function AdminCareers() {
   const [jobs, setJobs] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
 
   // Get token safely
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/admin/login");
+      return;
+    }
 
     const fetchJobs = async () => {
       try {
@@ -34,6 +39,8 @@ export default function AdminCareers() {
 
     fetchJobs();
   }, [ token]);
+
+  if (loading) return <p className="p-6">Loading...</p>;
 
   // Add a new job
   const handleAddJob = async () => {
