@@ -167,10 +167,10 @@ app.get("/api/messages/me", verifyToken, (req, res) => {
 // ===================
 app.get("/api/careers/me", verifyToken, (req, res) => {
   const sql = `
-    SELECT a.id, a.resume, a.created_at, j.title AS job_title
+    SELECT a.id, a.resume_path, a.applied_at, j.title AS job_title
     FROM applications a
     LEFT JOIN jobs j ON a.job_id = j.id
-    WHERE a.email = ?
+    WHERE a.applicant_email = ?
     ORDER BY a.id DESC
   `;
   db.query(sql, [req.user.email], (err, results) => {
