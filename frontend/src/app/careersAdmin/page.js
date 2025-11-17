@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminCareers() {
+
+  
   const [jobs, setJobs] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -14,7 +16,17 @@ export default function AdminCareers() {
   // Get token from localStorage
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-useEffect(() => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+
+    if (!token || !user || user.role !== "admin") {
+      router.replace("/login"); // now router is defined
+    }
+  }, [router]);
+
+  useEffect(() => {
   const fetchJobs = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/jobs"); // no trailing slash
@@ -30,7 +42,7 @@ useEffect(() => {
   };
 
   fetchJobs();
-}, []);
+  }, []);
 
   const handleAddJob = async () => {
     if (!title || !description) return alert("Please fill all fields");
