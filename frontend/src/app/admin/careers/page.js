@@ -2,48 +2,40 @@
 
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 
 export default function AdminCareers() {
-
-  
   const [jobs, setJobs] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
-  // Get token from localStorage
+
+  // Get token safely
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
 
-    if (!token || !user || user.role !== "admin") {
-      router.replace("/login"); // now router is defined
-    }
-  }, [router]);
+    const fetchJobs = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/jobs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch jobs");
+        const data = await res.json();
+        setJobs(data);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-  const fetchJobs = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/jobs"); // no trailing slash
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      const data = await res.json();
-      setJobs(data);
-    } catch (err) {
-      console.error("Failed to fetch jobs:", err);
-      alert("Failed to load jobs");
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchJobs();
+  }, [ token]);
 
-  fetchJobs();
-  }, []);
-
+  // Add a new job
   const handleAddJob = async () => {
     if (!title || !description) return alert("Please fill all fields");
 
@@ -52,7 +44,7 @@ export default function AdminCareers() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ title, description }),
       });
@@ -72,17 +64,18 @@ export default function AdminCareers() {
     }
   };
 
+  // Delete a job
   const handleDeleteJob = async (id) => {
     if (!confirm("Are you sure you want to delete this job?")) return;
 
     try {
       const res = await fetch(`http://localhost:5000/api/admin/jobs/${id}`, {
         method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.status === 204) {
-        setJobs(jobs.filter(job => job.id !== id));
+        setJobs(jobs.filter((job) => job.id !== id));
       } else {
         const error = await res.json();
         alert(error.message || "Failed to delete job");
@@ -93,12 +86,12 @@ export default function AdminCareers() {
     }
   };
 
-  if (loading) return <p className="p-8">Loading jobs...</p>;
+
 
   return (
     <>
-    <Navbar/>
-    
+      <Navbar />
+
       <div className="p-8 max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Manage Careers</h1>
 

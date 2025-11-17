@@ -52,7 +52,7 @@ export default function Navbar() {
 
 
         {user?.role === "admin" && (
-          <Link href="/careersAdmin"className="text-orange-400 hover:text-blue-600 font-semibold">Manage Careers</Link>
+          <Link href="/admin/careers"className="text-orange-400 hover:text-blue-600 font-semibold">Manage Careers</Link>
           
         )}
         {!user && (
