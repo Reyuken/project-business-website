@@ -196,6 +196,14 @@ app.post("/api/careers/apply", verifyToken, upload.single("resume"), (req, res) 
     return res.status(400).json({ message: "Resume file is required" });
   }
 
+    if (!jobId || !name || !email) {
+    // Delete the uploaded file immediately
+    fs.unlink(resumeFile.path, (unlinkErr) => {
+      if (unlinkErr) console.error("Failed to delete uploaded file:", unlinkErr);
+    });
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
   const resumePath = `/uploads/${resumeFile.filename}`;
 
   const sql = "INSERT INTO applications (applicant_name, applicant_email, resume_path, job_id) VALUES (?, ?, ?, ?)";
