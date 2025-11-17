@@ -145,6 +145,13 @@ app.post("/api/login", (req, res) => {
 });
 
 // ===================
+// ✅ Get Logged-in User
+// ===================
+app.get("/api/auth/me", verifyToken, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// ===================
 // ✅ Fetch Guest Messages
 // ===================
 app.get("/api/messages/me", verifyToken, (req, res) => {
@@ -178,7 +185,7 @@ app.get("/api/careers/me", verifyToken, (req, res) => {
 // ===================
 // ✅ Submit Career Application
 // ===================
-app.post("/api/careers/apply", upload.single("resume"), (req, res) => {
+app.post("/api/careers/apply", verifyToken, upload.single("resume"), (req, res) => {
   const { name, email, jobId } = req.body;
   const resumeFile = req.file;
 
@@ -263,3 +270,4 @@ app.delete("/api/admin/jobs/:id", verifyToken, (req, res) => {
     res.status(204).end();
   });
 });
+
