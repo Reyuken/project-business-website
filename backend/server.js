@@ -186,8 +186,11 @@ app.get("/api/careers/me", verifyToken, (req, res) => {
 // ✅ Submit Career Application
 // ===================
 app.post("/api/careers/apply", verifyToken, upload.single("resume"), (req, res) => {
-  const { name, email, jobId } = req.body;
+  const { jobId } = req.body;
   const resumeFile = req.file;
+
+  const name = req.user.name;
+  const email = req.user.email;
 
   if (!resumeFile) {
     return res.status(400).json({ message: "Resume file is required" });
