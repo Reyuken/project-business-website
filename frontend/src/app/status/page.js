@@ -52,12 +52,6 @@ export default function GuestStatusPage() {
         {/* Header and Logout */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-blue-700">Your Submissions</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
         </div>
 
         {messages.length === 0 ? (
