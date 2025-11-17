@@ -2,8 +2,12 @@
 
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Careers() {
+  const router = useRouter();
+  const [user, setUser] = useState(null); // store logged-in user
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,6 +21,24 @@ export default function Careers() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
   useEffect(() => {
+    async function fetchUser() {
+      const token = localStorage.getItem("token"); // read JWT token
+      if (!token) return; // no token → user not logged in
+
+      try {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.user) setUser(data.user); // store logged-in user
+      } catch (err) {
+        console.log("Not logged in");
+      }
+    }
+
+  fetchUser();
+}, []);
+  useEffect(() => {
     fetch(`${API_URL}/api/jobs`)
       .then((res) => res.json())
       .then((data) => {
@@ -29,10 +51,17 @@ export default function Careers() {
       });
   }, []);
 
-  const openApplyModal = (job) => {
-    setSelectedJob(job);
-    setShowModal(true);
-  };
+const openApplyModal = (job) => {
+  if (!user) {
+    // if user is not logged in, redirect to login page
+    return router.push("/login?redirect=/careers");
+  }
+
+  // user is logged in → open modal
+  setSelectedJob(job);
+  setShowModal(true);
+};
+
 
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
