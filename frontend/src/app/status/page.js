@@ -116,7 +116,7 @@ export default function GuestStatusPage() {
                         View Resume
                       </a>
                     </td>
-                    <td className="border p-2">{new Date(app.created_at).toLocaleString()}</td>
+                    <td className="border p-2">{new Date(app.applied_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
