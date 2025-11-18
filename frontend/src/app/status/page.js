@@ -10,12 +10,6 @@ export default function GuestStatusPage() {
   const router = useRouter();
   const [applications,setApplications] = useState([]);
 
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
