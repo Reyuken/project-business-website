@@ -96,9 +96,8 @@ export default function AdminCareers() {
 
 // Toggle active or inactive job
 const toggleActive = async (id, currentState) => {
-   console.log("Toggle clicked for job:", id, "currentState:", currentState);
+  
   const newState = !currentState;
-
   setTogglingId(id); // mark this job as toggling
 
   // Optimistic UI update
@@ -182,7 +181,7 @@ const toggleActive = async (id, currentState) => {
             >
               <div>
                 <h2 className="font-semibold">{job.title}</h2>
-                <p>{job.description}</p> <p>{job.active_check}</p> 
+                <p>{job.description}</p>
               </div>
               <div className="flex gap-2">
               <button
