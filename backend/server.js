@@ -47,7 +47,6 @@ db.connect(err => {
 // ✅ Helper: JWT Middleware
 // ===================
 function verifyToken(req, res, next) {
-  console.log("verifyToken called"); // <-- debug
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
@@ -274,7 +273,7 @@ app.post("/api/admin/jobs", verifyToken, (req, res) => {
   const sql = "INSERT INTO jobs (title, description) VALUES (?, ?)";
   db.query(sql, [title, description], (err, result) => {
     if (err) return res.status(500).json({ message: "Failed to add job" });
-    res.status(201).json({ id: result.insertId, title, description, active: false });
+    res.status(201).json({ id: result.insertId, title, description });
   });
 });
 
@@ -301,20 +300,18 @@ app.patch("/api/admin/jobs/:id", verifyToken, (req, res) => {
     return res.status(403).json({ message: "Access denied" });
 
   const jobId = req.params.id;
-  const { active } = req.body; // frontend sends 'active'
+  const { active } = req.body;
 
   if (typeof active !== "boolean") {
     return res.status(400).json({ message: "active must be boolean" });
   }
 
+  // Convert boolean to 1 or 0 for MySQL
   const activeValue = active ? 1 : 0;
 
   const sql = "UPDATE jobs SET active_check = ? WHERE id = ?";
   db.query(sql, [activeValue, jobId], (err, result) => {
     if (err) return res.status(500).json({ message: "Failed to update job" });
-
-    console.log("UPDATE result:", result); // ✅ will show affectedRows
-
     if (result.affectedRows === 0)
       return res.status(404).json({ message: "Job not found" });
 
@@ -325,13 +322,11 @@ app.patch("/api/admin/jobs/:id", verifyToken, (req, res) => {
           .status(500)
           .json({ message: "Failed to fetch updated job" });
 
+      // Convert MySQL tinyint → boolean before sending to frontend
       const job = rows[0];
-
-      // Convert DB tinyint → boolean for frontend
       job.active = job.active_check === 1;
 
-      res.json(job); // ✅ return the updated job
+      res.json(job);
     });
   });
 });
-
