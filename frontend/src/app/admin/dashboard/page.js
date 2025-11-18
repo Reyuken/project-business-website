@@ -58,17 +58,12 @@ export default function AdminDashboard() {
     <Navbar />
       <div className="max-w-6xl mx-auto p-6">
         {/* ✅ Dashboard Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-center items-center mb-6">
           <h1 className="text-2xl font-bold text-blue-700">Admin Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
         </div>
 
         {/* ✅ Messages Table */}
+        <h2 className="text-2xl font-bold text-blue-700 mt-8 mb-4 ">Messages</h2>
         {messages.length === 0 ? (
           <p>No submissions found.</p>
         ) : (
