@@ -163,6 +163,19 @@ app.get("/api/messages/me", verifyToken, (req, res) => {
 });
 
 // ===================
+// ✅ Admin: Fetch All Messages
+// ===================
+app.get("/api/admin/messages", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+
+  const sql = "SELECT * FROM messages ORDER BY id DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: "Failed to fetch messages" });
+    res.json(results);
+  });
+});
+
+// ===================
 // ✅ Fetch Guest Applications
 // ===================
 app.get("/api/careers/me", verifyToken, (req, res) => {
@@ -216,19 +229,6 @@ app.post("/api/careers/apply", verifyToken, upload.single("resume"), (req, res) 
   });
 });
 
-
-// ===================
-// ✅ Admin: Fetch All Messages
-// ===================
-app.get("/api/admin/messages", verifyToken, (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
-
-  const sql = "SELECT * FROM messages ORDER BY id DESC";
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json({ message: "Failed to fetch messages" });
-    res.json(results);
-  });
-});
 
 // ===================
 // ✅ Start Server
