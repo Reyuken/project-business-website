@@ -47,6 +47,7 @@ db.connect(err => {
 // ✅ Helper: JWT Middleware
 // ===================
 function verifyToken(req, res, next) {
+  console.log("verifyToken called"); // <-- debug
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
@@ -243,7 +244,7 @@ app.listen(PORT, "0.0.0.0", () => {
 // ===================
 
 app.get("/api/jobs", (req, res) => {
-  const sql = "SELECT * FROM jobs ORDER BY id DESC";
+  const sql = "SELECT * FROM jobs WHERE active_check = 1 ORDER BY id DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ message: "Failed to fetch jobs" });
     res.json(results);
@@ -254,6 +255,16 @@ app.get("/api/jobs", (req, res) => {
 // Get All Jobs (Admin)
 // ===================
 
+
+app.get("/api/admin/jobs", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
+  const sql = "SELECT * FROM jobs ORDER BY id DESC";
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ message: "Failed to fetch jobs" });
+    res.json(results);
+  });
+});
+
 app.post("/api/admin/jobs", verifyToken, (req, res) => {
   if (req.user.role !== "admin") return res.status(403).json({ message: "Access denied" });
 
@@ -263,7 +274,7 @@ app.post("/api/admin/jobs", verifyToken, (req, res) => {
   const sql = "INSERT INTO jobs (title, description) VALUES (?, ?)";
   db.query(sql, [title, description], (err, result) => {
     if (err) return res.status(500).json({ message: "Failed to add job" });
-    res.status(201).json({ id: result.insertId, title, description });
+    res.status(201).json({ id: result.insertId, title, description, active: false });
   });
 });
 
@@ -279,6 +290,48 @@ app.delete("/api/admin/jobs/:id", verifyToken, (req, res) => {
   db.query(sql, [id], (err) => {
     if (err) return res.status(500).json({ message: "Failed to delete job" });
     res.status(204).end();
+  });
+});
+
+// ===================
+// Toggle Job Active/Inactive (Admin)
+// ===================
+app.patch("/api/admin/jobs/:id", verifyToken, (req, res) => {
+  if (req.user.role !== "admin")
+    return res.status(403).json({ message: "Access denied" });
+
+  const jobId = req.params.id;
+  const { active } = req.body; // frontend sends 'active'
+
+  if (typeof active !== "boolean") {
+    return res.status(400).json({ message: "active must be boolean" });
+  }
+
+  const activeValue = active ? 1 : 0;
+
+  const sql = "UPDATE jobs SET active_check = ? WHERE id = ?";
+  db.query(sql, [activeValue, jobId], (err, result) => {
+    if (err) return res.status(500).json({ message: "Failed to update job" });
+
+    console.log("UPDATE result:", result); // ✅ will show affectedRows
+
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Job not found" });
+
+    // Fetch updated job
+    db.query("SELECT * FROM jobs WHERE id = ?", [jobId], (err2, rows) => {
+      if (err2)
+        return res
+          .status(500)
+          .json({ message: "Failed to fetch updated job" });
+
+      const job = rows[0];
+
+      // Convert DB tinyint → boolean for frontend
+      job.active = job.active_check === 1;
+
+      res.json(job); // ✅ return the updated job
+    });
   });
 });
 

@@ -40,6 +40,7 @@ export default function Careers() {
     fetch(`${API_URL}/api/jobs`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Jobs response:", data);
         setJobs(data);
         setLoading(false);
       })

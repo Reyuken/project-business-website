@@ -9,6 +9,7 @@ export default function AdminCareers() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState(null);
   const router = useRouter();
 
   // Get token safely
@@ -23,7 +24,7 @@ export default function AdminCareers() {
 
     const fetchJobs = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/jobs", {
+        const res = await fetch("http://localhost:5000/api/admin/jobs", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch jobs");
@@ -93,6 +94,52 @@ export default function AdminCareers() {
     }
   };
 
+// Toggle active or inactive job
+const toggleActive = async (id, currentState) => {
+   console.log("Toggle clicked for job:", id, "currentState:", currentState);
+  const newState = !currentState;
+
+  setTogglingId(id); // mark this job as toggling
+
+  // Optimistic UI update
+  setJobs(prev =>
+    prev.map(job => (job.id === id ? { ...job, active: newState } : job))
+  );
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/admin/jobs/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ active: newState }), // send 'active' to backend
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || "Failed to update job");
+
+    // Sync server response
+    setJobs(prev =>
+      prev.map(job => (job.id === id ? data : job))
+    );
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+
+    // revert if update fails
+    setJobs(prev =>
+      prev.map(job =>
+        job.id === id ? { ...job, active: currentState } : job
+      )
+    );
+  } finally {
+    setTogglingId(null); // done toggling
+  }
+
+};
+
 
 
   return (
@@ -135,14 +182,26 @@ export default function AdminCareers() {
             >
               <div>
                 <h2 className="font-semibold">{job.title}</h2>
-                <p>{job.description}</p>
+                <p>{job.description}</p> <p>{job.active_check}</p> 
               </div>
+              <div className="flex gap-2">
               <button
                 onClick={() => handleDeleteJob(job.id)}
                 className="text-red-600 font-bold hover:text-red-800"
               >
                 Delete
               </button>
+              <button
+                  onClick={() => toggleActive(job.id, job.active_check)}
+                  disabled={togglingId === job.id} // disable only the job being toggled
+                  className={`font-bold px-2 py-1 rounded ${
+                  job.active_check ? "text-green-600 hover:text-green-800" : "text-red-600 hover:text-red-800" 
+                  } ${togglingId === job.id ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {job.active_check? "Active" : "Inactive"}
+              </button>
+              </div>
+
             </li>
           ))}
         </ul>
