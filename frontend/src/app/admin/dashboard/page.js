@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [applications,setApplications] = useState([]);
   const router = useRouter();
 
   // ✅ Handle logout
@@ -22,25 +23,31 @@ export default function AdminDashboard() {
       return;
     }
 
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/admin/messages", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    const fetchData = async () =>{
+      try{
+        // fetch messagess //
+        const resMsg = await fetch("http://localhost:5000/api/admin/messages", {
+          headers: { Authorization: `Bearer ${token}`},
         });
+        if (!resMsg.ok) throw new Error("Failed to fetch your messages");
+        const msgData = await resMsg.json();
+        setMessages(msgData);
+          //fetch job applications //
+        const resApps = await fetch("http://localhost:5000/api/careers/me", {
+          headers: { Authorization: `Bearer ${token}`},
+        });
+        if (!resApps.ok) throw new Error("Failed to fetch your job applications");
+        const appsData = await resApps.json();
+        setApplications(appsData);
 
-        if (!res.ok) throw new Error("Failed to fetch messages");
-        const data = await res.json();
-        setMessages(data);
       } catch (err) {
         setError(err.message);
-      } finally {
+      } finally{
         setLoading(false);
       }
     };
 
-    fetchMessages();
+    fetchData();
   }, [router]);
 
   if (loading) return <p className="p-6">Loading messages...</p>;
@@ -62,6 +69,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* ✅ Messages Table */}
+        {messages.length === 0 ? (
+          <p>No submissions found.</p>
+        ) : (
         <div className="overflow-x-auto border rounded-lg shadow">
           <table className="w-full border-collapse">
             <thead>
@@ -86,6 +96,46 @@ export default function AdminDashboard() {
             </tbody>
           </table>
         </div>
+        )}
+        {/*job applications */}
+        <h2 className="text-2xl font-bold text-blue-700 mt-8 mb-4 ">Job Applications</h2>
+        {applications.length === 0 ? (
+          <p>No applications found.</p>
+        ) : (
+          <div className="overflow-x-auto border rounded-lg shadow">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-blue-100">
+                  <th className="border p-2">Applicant</th>
+                  <th className="border p-2">Email Address</th>
+                  <th className="border p-2">Job Title</th>
+                  <th className="border p-2">Resume</th>
+                  <th className="border p-2">Date Applied</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.map((app) => (
+                  <tr key={app.id} className="hover:bg-gray-100">
+                    <td className="border p-2">{app.applicant_name}</td>
+                    <td className="border p-2">{app.applicant_email}</td>
+                    <td className="border p-2">{app.job_title}</td>
+                    <td className="border p-2">
+                      <a
+                        href={`http://localhost:5000${app.resume_path}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View Resume
+                      </a>
+                    </td>
+                    <td className="border p-2">{new Date(app.applied_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </>
   );

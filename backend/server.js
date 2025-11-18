@@ -179,14 +179,28 @@ app.get("/api/admin/messages", verifyToken, (req, res) => {
 // ✅ Fetch Guest Applications
 // ===================
 app.get("/api/careers/me", verifyToken, (req, res) => {
-  const sql = `
+  let sql;
+  let params= [];
+
+  if (req.user.role === "admin"){
+   sql = `
+    SELECT a.id, a.applicant_name, a.applicant_email, a.resume_path, a.applied_at, j.title AS job_title
+    FROM applications a
+    LEFT JOIN jobs j ON a.job_id = j.id
+    ORDER BY a.id DESC
+  `;
+  }else{
+   sql = `
     SELECT a.id, a.resume_path, a.applied_at, j.title AS job_title
     FROM applications a
     LEFT JOIN jobs j ON a.job_id = j.id
     WHERE a.applicant_email = ?
     ORDER BY a.id DESC
   `;
-  db.query(sql, [req.user.email], (err, results) => {
+  params.push(req.user.email);
+  }
+
+  db.query(sql, params, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: "Failed to fetch applications" });
