@@ -25,8 +25,8 @@ export default function LoginPage() {
     if (res.ok) {
       localStorage.setItem("token", data.token);
       setStatus("✅ Logged in!");
-      if (data.user.role === "admin") router.push("/admin/dashboard");
-      else router.push("/status");
+      if (data.user.role === "admin") router.replace("/admin/dashboard");
+      else router.replace("/status");
     } else {
       setStatus("❌ " + data.message);
     }
