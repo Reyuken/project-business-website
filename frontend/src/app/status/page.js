@@ -94,6 +94,7 @@ export default function GuestStatusPage() {
                   <th className="border p-2">Job Title</th>
                   <th className="border p-2">Resume</th>
                   <th className="border p-2">Date Applied</th>
+                  <th className="border p-2">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -111,6 +112,7 @@ export default function GuestStatusPage() {
                       </a>
                     </td>
                     <td className="border p-2">{new Date(app.applied_at).toLocaleString()}</td>
+                    <td className="border p-2">{app.application_status}</td>
                   </tr>
                 ))}
               </tbody>

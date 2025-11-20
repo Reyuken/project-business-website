@@ -184,14 +184,14 @@ app.get("/api/careers/me", verifyToken, (req, res) => {
 
   if (req.user.role === "admin"){
    sql = `
-    SELECT a.id, a.applicant_name, a.applicant_email, a.resume_path, a.applied_at, j.title AS job_title
+    SELECT a.id, a.applicant_name, a.applicant_email, a.resume_path, a.applied_at, a.application_status, j.title AS job_title
     FROM applications a
     LEFT JOIN jobs j ON a.job_id = j.id
     ORDER BY a.id DESC
   `;
   }else{
    sql = `
-    SELECT a.id, a.resume_path, a.applied_at, j.title AS job_title
+    SELECT a.id, a.resume_path, a.applied_at, a.application_status, j.title AS job_title
     FROM applications a
     LEFT JOIN jobs j ON a.job_id = j.id
     WHERE a.applicant_email = ?
@@ -242,7 +242,23 @@ app.post("/api/careers/apply", verifyToken, upload.single("resume"), (req, res) 
     res.status(200).json({ message: "Application submitted successfully!" });
   });
 });
+// ===================
+// Admin update application status
+// ===================
+app.patch('/api/admin/applications/:id', verifyToken, (req, res) => {
+  if (req.user.role !== "admin")
+  return res.status(403).json({ message: "Access denied" });
+  const appId = req.params.id;           // get the application id from URL
+  const { status } = req.body;           // get the new status from request body
 
+  const sql = "UPDATE applications SET application_status = ? WHERE id = ?";
+  db.query(sql, [status, appId], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error" });
+    if (result.affectedRows === 0) return res.status(404).json({ message: "Application not found" });
+
+    res.json({ message: "Status updated successfully" });
+  });
+});
 
 // ===================
 // ✅ Start Server
