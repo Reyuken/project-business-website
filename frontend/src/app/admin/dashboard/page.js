@@ -40,12 +40,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // ✅ Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/admin/login");
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
