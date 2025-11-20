@@ -13,6 +13,7 @@ export default function Careers() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isOpenDescription, setIsOpenDescription] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -116,16 +117,41 @@ export default function Careers() {
         <h1 className="text-3xl font-bold mb-6 text-center">Career Opportunities</h1>
         <ul className="space-y-6">
           {jobs.map((job) => (
-            <li key={job.id} className="border p-6 rounded-md shadow hover:shadow-lg transition duration-200">
+            <li key={job.id} className="relative border p-6 rounded-md shadow hover:shadow-lg transition duration-200">
               <h2 className="text-xl font-semibold mb-2">{job.title}</h2>
-              <p className="mb-2">{job.description}</p>
               {job.created_at && (
                 <p className="text-gray-500 text-sm">
                   Posted: {new Date(job.created_at).toLocaleDateString()}
                 </p>
               )}
+              <button className="text-sm text-gray-700 hover:text-blue-500" onClick={() => setIsOpenDescription(job.id)}>
+                  View Full Description
+              </button>
+
+                {/* modal for description */}
+                {isOpenDescription === job.id && (
+                  <div
+                    className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+                    onClick={() => setIsOpenDescription(null)} // close on background click
+                  >
+                    <div
+                      className="relative pt-10 bg-white rounded-lg p-6 w-full max-w-md"
+                      onClick={(e) => e.stopPropagation()} // prevent closing when clicking modal
+                    >
+                      <button
+                        onClick={() => setIsOpenDescription(null)}
+                        className="absolute top-2 right-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Close
+                      </button>
+                      <h2 className="font-semibold ">{job.title}</h2>
+                      <div dangerouslySetInnerHTML={{ __html: job.description }} />
+                    </div>
+                  </div>                 
+                )}
+
               <button
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="absolute bottom-2 right-2 mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 onClick={() => openApplyModal(job)}
               >
                 Apply
@@ -137,7 +163,7 @@ export default function Careers() {
 
       {showModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={() => setShowModal(false)}
         >
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}>

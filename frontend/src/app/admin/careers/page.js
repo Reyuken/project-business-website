@@ -3,6 +3,8 @@
 import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 
 export default function AdminCareers() {
   const [jobs, setJobs] = useState([]);
@@ -10,10 +12,73 @@ export default function AdminCareers() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
   const [togglingId, setTogglingId] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDescription, setIsOpenDescription] = useState(false);
   const router = useRouter();
 
   // Get token safely
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  const sampleDescription = `        
+      <h2>Job Responsibilities</h2>
+        <ul>
+          <li>Responsibility 1</li>
+          <li>Responsibility 2</li>
+        </ul>
+        <h2>Requirements</h2>
+        <ul>
+          <li>Requirement 1</li>
+          <li>Requirement 2</li>
+        </ul>
+      `;
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: sampleDescription || "",
+    immediatelyRender: false,
+
+    onUpdate: ({ editor }) => setDescription(editor.getHTML()),
+
+    editorProps: {
+      attributes: {
+        class: "prose p-2 w-full min-h-[200px] border rounded",
+      },
+
+      handleKeyDown(view, event) {
+        if (event.key !== "Tab") return false;
+
+        const { state, dispatch } = view;
+        const { from } = state.selection;
+
+        // Check if inside list item
+        const insideList = state.selection.$from.parent.type.name === "listItem";
+
+        // If inside list → allow Tiptap to manage indentation
+        if (insideList) return false;
+
+        // For non-list cases, prevent browser's default tab behavior
+        event.preventDefault();
+
+        const spaces = "\u00A0\u00A0\u00A0\u00A0";
+
+        // SHIFT + TAB → Outdent
+        if (event.shiftKey) {
+          const before = state.doc.textBetween(Math.max(0, from - 4), from);
+          const count = (before.match(/\u00A0/g) || []).length;
+
+          if (count > 0) {
+            dispatch(state.tr.delete(from - count, from));
+          }
+          return true;
+        }
+
+        // TAB → Insert spaces
+        dispatch(state.tr.insertText(spaces, from, from));
+        return true;
+      },
+    },
+  });
+
+      
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -21,7 +86,7 @@ export default function AdminCareers() {
       router.push("/admin/login");
       return;
     }
-
+    
     const fetchJobs = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/admin/jobs", {
@@ -45,6 +110,7 @@ export default function AdminCareers() {
 
   // Add a new job
   const handleAddJob = async () => {
+    const content = editor.getHTML(); // get editor content as HTML
     if (!title || !description) return alert("Please fill all fields");
 
     try {
@@ -54,7 +120,7 @@ export default function AdminCareers() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, description }),
+        body: JSON.stringify({ title, description:content }),
       });
 
       if (!res.ok) {
@@ -65,12 +131,13 @@ export default function AdminCareers() {
       const newJob = await res.json();
       setJobs([newJob, ...jobs]);
       setTitle("");
-      setDescription("");
+      editor.commands.setContent(''); // reset editor
     } catch (err) {
       console.error(err);
       alert("Error adding job");
     }
   };
+  
 
   // Delete a job
   const handleDeleteJob = async (id) => {
@@ -149,27 +216,55 @@ const toggleActive = async (id, currentState) => {
         <h1 className="text-3xl font-bold mb-6">Manage Careers</h1>
 
         {/* Add Job Form */}
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Job Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border p-2 flex-1 rounded"
-          />
-          <input
-            type="text"
-            placeholder="Job Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 flex-2 rounded"
-          />
+        <div>
+          {/* Button to open modal */}
           <button
-            onClick={handleAddJob}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            onClick={() => setIsOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Add Job
           </button>
+
+          {/* Modal */}
+          {isOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+              <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <h2 className="text-xl font-semibold mb-4">Add Job</h2>
+                <input
+                  type="text"
+                  placeholder="Job Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="border p-2 w-full mb-4 rounded"
+                />
+                <div className="border rounded mb-4 min-h-[150px]">
+                  {editor && <EditorContent editor={editor} />}
+                </div>
+
+                <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setTitle("");               // reset title
+                    editor.commands.setContent(sampleDescription); // reset editor content
+                  }}
+                  className="px-4 py-2 rounded border hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                  <button
+                    onClick={()=>{
+                      handleAddJob(); 
+                      setIsOpen(false);
+                    }}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
+                  >
+                    Add Job
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Jobs List */}
@@ -180,30 +275,57 @@ const toggleActive = async (id, currentState) => {
               className="border p-4 rounded-md flex justify-between items-center shadow-sm"
             >
               <div>
-                <h2 className="font-semibold">{job.title}</h2>
-                <p>{job.description}</p>
-              </div>
-              <div className="flex gap-2">
-              <button
-                onClick={() => handleDeleteJob(job.id)}
-                className="text-red-600 font-bold hover:text-red-800"
-              >
-                Delete
-              </button>
-              <button
-                  onClick={() => toggleActive(job.id, job.active_check)}
-                  disabled={togglingId === job.id} // disable only the job being toggled
-                  className={`font-bold px-2 py-1 rounded ${
-                  job.active_check ? "text-green-600 hover:text-green-800" : "text-red-600 hover:text-red-800" 
-                  } ${togglingId === job.id ? "opacity-50 cursor-not-allowed" : ""}`}
-              >
-                {job.active_check? "Active" : "Inactive"}
-              </button>
+                <h2 className="font-semibold ">{job.title}</h2>
+                <button className="text-sm text-gray-700 hover:text-blue-500" onClick={() => setIsOpenDescription(job.id)}>
+                  View Full Description
+                </button>
+
+                {/* modal for description */}
+                {isOpenDescription === job.id && (
+                  <div
+                    className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+                    onClick={() => setIsOpenDescription(null)} // close on background click
+                  >
+                    <div
+                      className="relative pt-10 bg-white rounded-lg p-6 w-full max-w-md"
+                      onClick={(e) => e.stopPropagation()} // prevent closing when clicking modal
+                    >
+                      <button
+                        onClick={() => setIsOpenDescription(null)}
+                        className="absolute top-2 right-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      >
+                        Close
+                      </button>
+                      <h2 className="font-semibold ">{job.title}</h2>
+                      <div dangerouslySetInnerHTML={{ __html: job.description }} />
+                    </div>
+                  </div>                 
+                )}
               </div>
 
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleDeleteJob(job.id)}
+                  className="text-red-600 font-bold hover:text-red-800"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => toggleActive(job.id, job.active_check)}
+                  disabled={togglingId === job.id}
+                  className={`font-bold px-2 py-1 rounded ${
+                    job.active_check
+                      ? "text-green-600 hover:text-green-800"
+                      : "text-red-600 hover:text-red-800"
+                  } ${togglingId === job.id ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {job.active_check ? "Active" : "Inactive"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
+
       </div>
     </>
   );
