@@ -91,7 +91,7 @@ export default function ContactPage() {
                 status === "Sending..." ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {status === "Sending..." ? "Sending..." : "Send"}
+               Send
             </button>
           </form>
 
